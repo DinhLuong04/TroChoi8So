@@ -11,7 +11,7 @@ from src.utils import algorithm, Board, A_STAR, BFS
 class EightPuzzle(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
-        self.title('8-Puzzle Game')
+        self.title('Tro choi 8 so')
         self.geometry('750x750')
         self.resizable(False, False)
         self.iconbitmap('src/assets/images/app.ico')
@@ -62,10 +62,10 @@ class PuzzlePage(tk.Frame):
         self.frame_title = tk.Frame(self, **BASIC_FRAME_PROPERTIES)
         self.frame_title.pack(pady=25)
         
-        self.label_heading = tk.Label(self.frame_title, text='8-Puzzle Game', **HEADING_LABEL_PROPERTIES)
+        self.label_heading = tk.Label(self.frame_title, text='Tro choi 8 so', **HEADING_LABEL_PROPERTIES)
         self.label_heading.pack()
         
-        self.label_subheading = tk.Label(self.frame_title, text=f'solved using {self.algorithm.name} algorithm', **SUBHEADING_LABEL_PROPERTIES)
+        self.label_subheading = tk.Label(self.frame_title, text=f'Giai thuat su dung: {self.algorithm.name} ', **SUBHEADING_LABEL_PROPERTIES)
         self.label_subheading.pack()
         
         # Puzzle section
@@ -76,19 +76,19 @@ class PuzzlePage(tk.Frame):
         self.frame_buttons = tk.Frame(self, **BASIC_FRAME_PROPERTIES)
         self.frame_buttons.pack(pady=20)
         
-        self.button_solve = tk.Button(self.frame_buttons, text='solve', command=lambda: self.solve_board(), **PRIMARY_BUTTON_PROPERTIES)
+        self.button_solve = tk.Button(self.frame_buttons, text='Giai', command=lambda: self.solve_board(), **PRIMARY_BUTTON_PROPERTIES)
         self.button_solve.grid(row=0, column=0, padx=10, pady=10)
         
         self.button_reset = tk.Button(self.frame_buttons, text='reset', command=lambda: self.reset_board(), **SECONDARY_BUTTON_PROPERTIES)
         self.button_reset.grid(row=0, column=1, padx=10, pady=10)
         
-        self.button_shuffle = tk.Button(self.frame_buttons, text='shuffle', command=lambda: self.shuffle_board(), **PRIMARY_BUTTON_PROPERTIES)
+        self.button_shuffle = tk.Button(self.frame_buttons, text='Xao tron', command=lambda: self.shuffle_board(), **PRIMARY_BUTTON_PROPERTIES)
         self.button_shuffle.grid(row=0, column=2, padx=10, pady=10)
         
         self.button_change = tk.Button(self.frame_buttons, text='change', command=lambda: self.change_algorithm(), **TERTIARY_BUTTON_PROPERTIES)
         self.button_change.grid(row=0, column=3, padx=10, pady=10)
         
-        self.label_moves = tk.Label(self.frame_puzzle, text=f'Moves: {self.moves}', **TEXT_LABEL_PROPERTIES)
+        self.label_moves = tk.Label(self.frame_puzzle, text=f'So buoc: {self.moves}', **TEXT_LABEL_PROPERTIES)
         self.label_moves.grid(row=0, column=0, sticky='w', padx=10, pady=5)
         
         self.label_status = tk.Label(self.frame_puzzle, text=f'Playing...', **TEXT_LABEL_PROPERTIES)
@@ -140,22 +140,22 @@ class PuzzlePage(tk.Frame):
         self.is_stopped = False
         self.is_solving = True
         self.is_done = False
-        self.update_status('Solving...')
+        self.update_status('Dang giai...')
         
-        print('\nFinding solution...')
+        print('\nDang tim giai phap...')
         
         path_to_goal, nodes_expanded, max_search_depth, time_elasped = Board.solve(self.current_board_state, self.algorithm.func)
         
         if not self.is_stopped:
-            print(f'Done in {round(time_elasped, 4)} second(s) with {len(path_to_goal)} moves using {self.algorithm.name}')
-            print(f'Has a max search depth of {max_search_depth} and nodes expanded of {nodes_expanded}')
-            print('Actions:', *path_to_goal)
+             print(f'Hoan thanh trong {round(time_elasped, 4)} giay voi {len(path_to_goal)} buoc su dung thuat toan {self.algorithm.name}')
+             print(f'Do sau tim kiem toi da la {max_search_depth} va so nut mo rong la {nodes_expanded}')
+             print('Cac hanh dong:', *path_to_goal)
         else:
             print('Stopped')
         
         if path_to_goal:
             print('\nMoving board...')
-            self.update_status('Moving...')
+            self.update_status('Dang di chuyen...')
             
             delay_time = 0.75
             time.sleep(delay_time)
@@ -163,25 +163,25 @@ class PuzzlePage(tk.Frame):
             for action in path_to_goal:
                 if self.is_stopped:
                     print('Stopped')
-                    self.update_status('Playing...')
+                    self.update_status('Dang choi...')
                     break
                 else:
                     self.transform_state(action, delay_time=0.5)
             else:
-                print('Done board animation')
-                self.update_status('Solved!')
+                print('Hoan thanh chuyen dong ban co')
+                self.update_status('Da giai xong!')
                 self.is_done = True
             
             self.is_solving = False
         
         else:
             self.is_solving = False
-            self.update_status('Playing...')
+            self.update_status('Dang choi...')
     
     def reset_board(self):
         self.stop_solution()
         self.update_moves(0)
-        self.update_status('Playing...')
+        self.update_status('Dang choi...')
         self.populate_board(state=self.saved_board_state)
     
     def shuffle_board(self):
@@ -197,7 +197,7 @@ class PuzzlePage(tk.Frame):
         self.reset_board()
         self.algorithm_index = (self.algorithm_index + 1) % len(self.available_algorithms)
         self.algorithm = self.available_algorithms[self.algorithm_index]
-        self.label_subheading.configure(text=f'solved using {self.algorithm.name} algorithm')
+        self.label_subheading.configure(text=f'Giai bang thuat toan  {self.algorithm.name} ')
     
     def transform_click(self, tile_index):
         possible_actions = Board.valid_actions(self.current_board_state)

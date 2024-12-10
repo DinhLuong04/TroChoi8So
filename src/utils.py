@@ -8,17 +8,17 @@ algorithm = namedtuple('Algorithm', ['name', 'func'])
 class Board:
     @staticmethod
     def translate_to_2D(index):
-        """Returns a tuple of 2D coordinate equivalent"""
+        """Tra ve toa do 2D tuong duong"""
         return index // 3, index % 3
     
     @staticmethod
     def manhattan_distance(x1, y1, x2, y2):
-        """Returns a manhattan distance between two points"""
+        """Tra ve khoang cach manhattan giua hai diem"""
         return abs(x1 - x2) + abs(y1 - y2)
     
     @staticmethod
     def valid_actions(state):
-        """Generates valid actions of a given state"""
+        """Sinh cac hanh dong hop le cua mot trang thai"""
         blank_index = state.index(0)
         if blank_index > 2:
             yield 'U'
@@ -31,7 +31,7 @@ class Board:
     
     @staticmethod
     def transform(state, action):
-        """Returns a new instance of a state when an action is applied"""
+        """Tra ve trang thai moi khi ap dung mot hanh dong"""
         state = [*state]
         blank_index = state.index(0)
         match action:
@@ -47,7 +47,7 @@ class Board:
     
     @staticmethod
     def inversions(state):
-        """Returns the inversion sum of a state"""
+        """Tra ve tong so nghich the cua mot trang thai"""
         inversion_sum = 0
         for i in range(9):
             for j in range(i + 1, 9):
@@ -57,12 +57,12 @@ class Board:
     
     @staticmethod
     def is_solvable(state):
-        """Checks if a state is solvable or not"""
+        """Kiem tra trang thai co giai duoc khong"""
         return Board.inversions(state) % 2 == 0
     
     @staticmethod
     def create_solvable_state():
-        """Returns a random solvable state"""
+        """Tra ve mot trang thai ngau nhien co the giai"""
         state = [*range(9)]
         while True:
             random.shuffle(state)
@@ -71,7 +71,7 @@ class Board:
     
     @staticmethod
     def solve(state, func):
-        """Returns the solution of a state given a search algorithm"""
+        """Tra ve ket qua cua mot trang thai voi thuat toan tim kiem"""
         board_node = BoardNode(state)
         
         start_time = time.time()
@@ -85,7 +85,7 @@ class Board:
     
     @staticmethod
     def draw(state):
-        """Returns a string representation of a state"""
+        """Tra ve chuoi bieu dien cua mot trang thai"""
         return '{} {} {}\n{} {} {}\n{} {} {}'.format(*state)
 
 class Node:
@@ -95,11 +95,11 @@ class Node:
         self.nodes = []
     
     def add_node(self, node):
-        """Adds new node to the children of the current node"""
+        """Them mot nut moi vao danh sach con"""
         self.nodes.append(node)
     
     def iterate_ancestors(self):
-        """Generates the ancestor nodes of the current node"""
+        """Sinh cac nut to tien cua nut hien tai"""
         curr_node = self
         while curr_node:
             yield curr_node
@@ -114,7 +114,7 @@ class BoardNode(Node):
         self.heuristic_func = Board.manhattan_distance
     
     def cost(self):
-        """Returns the heuristic cost of the state"""
+        """Tra ve chi phi heuristic cua trang thai"""
         heuristic_sum = 0
         for index, item in enumerate(self.state):
             curr_x, curr_y = Board.translate_to_2D(index)
@@ -123,7 +123,7 @@ class BoardNode(Node):
         return heuristic_sum + self.depth
     
     def expand(self):
-        """Expand valid actions as the children of the current state"""
+        """Mo rong cac hanh dong hop le cua trang thai hien tai"""
         if not self.nodes:
             for action in Board.valid_actions(self.state):
                 self.add_node(BoardNode(
@@ -134,31 +134,31 @@ class BoardNode(Node):
                     ))
     
     def actions(self):
-        """Returns all the action of the ancestor states"""
+        """Tra ve cac hanh dong cua trang thai to tien"""
         return tuple(node.action for node in self.iterate_ancestors())[-2::-1]
     
     def is_goal(self):
-        """Checks if current state is equal to the goal state"""
+        """Kiem tra trang thai hien tai co bang muc tieu khong"""
         return self.state == self.goal
     
     def __lt__(self, other):
-        """Checks if cost of current state is less than the cost of the other state"""
+        """Kiem tra chi phi cua trang thai hien tai nho hon trang thai khac khong"""
         return self.cost() < other.cost()
     
     def __eq__(self, other):
-        """Checks if cost of current state is equal to the cost of the other state"""
+        """Kiem tra chi phi cua trang thai hien tai bang trang thai khac khong"""
         return self.cost() == other.cost()
     
     def __str__(self):
-        """Returns the string representation of the state"""
+        """Tra ve bieu dien chuoi cua trang thai"""
         return Board.draw(self.state)
     
     def __repr__(self):
-        """Returns the actual representation of the state"""
+        """Tra ve bieu dien cua trang thai"""
         return f'Board(state={self.state}, action={self.action}, depth={self.depth})'
 
 def A_STAR(start_node):
-    """Returns the goal node"""
+    """Tra ve nut muc tieu"""
     frontier = []
     explored_nodes = set()
     nodes_expanded = 0
@@ -187,7 +187,7 @@ def A_STAR(start_node):
     return None
 
 def BFS(start_node):
-    """Returns the goal node"""
+    """Tra ve nut muc tieu"""
     frontier = deque()
     explored_nodes = set()
     nodes_expanded = 0
@@ -216,23 +216,23 @@ def BFS(start_node):
     return None
 
 if __name__ == '__main__':
-    # start state
+    # trang thai bat dau
     start_state = Board.create_solvable_state() #(8, 6, 7, 2, 5, 4, 3, 0, 1)
-    print('Start state:')
+    print('Trang thai bat dau:')
     print(Board.draw(start_state))
     
-    # solved using A*
-    print('\nFinding solution...')
+    # giai bang A*
+    print('\nTim giai phap...')
     path_to_goal, nodes_expanded, max_search_depth, time_elasped = Board.solve(start_state, A_STAR)
     
-    print(f'Done in {round(time_elasped, 4)} second(s) with {len(path_to_goal)} moves using A*')
-    print(f'Has a max search depth of {max_search_depth} and nodes expanded of {nodes_expanded}')
-    print('Actions:', *path_to_goal)
+    print(f'Hoan thanh trong {round(time_elasped, 4)} giay voi {len(path_to_goal)} buoc di bang A*')
+    print(f'Do sau tim kiem toi da la {max_search_depth} va so nut duoc mo rong la {nodes_expanded}')
+    print('Cac hanh dong:', *path_to_goal)
     
-    # solved using BFS
-    print('\nFinding solution...')
+    # giai bang BFS
+    print('\nTim giai phap...')
     path_to_goal, nodes_expanded, max_search_depth, time_elasped = Board.solve(start_state, BFS)
     
-    print(f'Done in {round(time_elasped, 4)} second(s) with {len(path_to_goal)} moves using BFS')
-    print(f'Has a max search depth of {max_search_depth} and nodes expanded of {nodes_expanded}')
-    print('Actions:', *path_to_goal)
+    print(f'Hoan thanh trong {round(time_elasped, 4)} giay voi {len(path_to_goal)} buoc di bang BFS')
+    print(f'Do sau tim kiem toi da la {max_search_depth} va so nut duoc mo rong la {nodes_expanded}')
+    print('Cac hanh dong:', *path_to_goal)
